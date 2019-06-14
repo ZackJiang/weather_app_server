@@ -1,11 +1,27 @@
 const https = require('https');
-const Weather = require('../models/weather');
 
-const getWeatherInfo = async (req, res) => {
+const Weather = require('../models/weather');
+const redisClient = require('../services/redis-client');
+const redisKey = 'weather';
+
+const getWeatherInfo = (req, res) => {
 
     try {
-        let result = await Weather.find({});
-        res.send(result);
+        redisClient.get(redisKey, async(err, result) => {
+
+            if (err) res.status(400).json({message:`${err}`});
+
+            if (result) {
+                console.log('Data is coming from redis');
+                const resultJSON = JSON.parse(result);
+                res.status(200).json(resultJSON);
+            } else {
+                console.log('Data is coming from mongodb');
+                let doc = await Weather.find({});
+                redisClient.setex(redisKey, 3600, JSON.stringify(doc));
+                res.status(200).json(doc);
+            }
+        });    
     }
     catch(error) {
         res.status(400).json({message:`${error}`});
@@ -22,17 +38,17 @@ const fetchWeatherFromCWB = () => {
             body += chunk;
         });
     
-        res.on('end', function(){
+        res.on('end', async function() {
             let res = JSON.parse(body);
+            await Weather.findOneAndDelete();
             let weather = new Weather(res.records);
-        
             weather.save( (error) => {
                 if (error) {
                     console.log(`${error}`)
                 }
                 console.log('weather information saved')
             })
-
+            redisClient.del(redisKey);
         });
     })
     .on('error', function(e){

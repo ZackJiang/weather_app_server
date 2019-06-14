@@ -1,9 +1,9 @@
 const express=require('express');
-const router = require('./routes/routes');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
+const router = require('./routes/routes');
 const {cronTask} = require('./services/cron');
 
 const dev_db_url = 'mongodb://localhost:27017/weather';
