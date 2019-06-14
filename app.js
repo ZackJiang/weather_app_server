@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-const {task} = require('./services/cron');
+const {cronTask} = require('./services/cron');
 
 const dev_db_url = 'mongodb://localhost:27017/weather';
 mongoose.connect(dev_db_url);
@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/api/', router);
 
-task.start();
+cronTask.start();
 
 dotenv.config();
 

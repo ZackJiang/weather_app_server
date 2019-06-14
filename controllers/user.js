@@ -17,10 +17,10 @@ const addUser = (req, res) => {
     })
 }
 
-const signInUser = (req, res) => {
+const signInUser = async (req, res) => {
     
-    User.findOne({email:req.body.email})
-    .then( (user) => {
+    try {
+        let user = await User.findOne({email:req.body.email});
         user.comparePassword(req.body.password, (err,isMatch) => {
             if(isMatch){
                 var token=jwt.sign({userId:user.id}, process.env.JWT_KEY);
@@ -34,10 +34,10 @@ const signInUser = (req, res) => {
                 res.status(400).json({message:'Invalid Password/Username'});
             }
         })
-    })
-    .catch( (err) =>{
+    }
+    catch (e) {
         res.status(400).json({message:'Invalid Password/Username'});
-    })
+    }
 }
 
 const isValidUser = (req, res, next) => {

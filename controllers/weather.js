@@ -1,8 +1,15 @@
 const https = require('https');
 const Weather = require('../models/weather');
 
-const getWeatherInfo = (req, res) => {
-    res.send('Get weather successfully');
+const getWeatherInfo = async (req, res) => {
+
+    try {
+        let result = await Weather.find({});
+        res.send(result);
+    }
+    catch(error) {
+        res.status(400).json({message:`${error}`});
+    }
 }
 
 const fetchWeatherFromCWB = () => {
@@ -19,11 +26,11 @@ const fetchWeatherFromCWB = () => {
             let res = JSON.parse(body);
             let weather = new Weather(res.records);
         
-            weather.save( (err) => {
-                if (err) {
-                    console.log('error')
+            weather.save( (error) => {
+                if (error) {
+                    console.log(`${error}`)
                 }
-                console.log('success')
+                console.log('weather information saved')
             })
 
         });
