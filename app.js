@@ -6,8 +6,9 @@ const dotenv = require('dotenv');
 const router = require('./routes/routes');
 const {cronTask} = require('./services/cron');
 
-const dev_db_url = 'mongodb://localhost:27017/weather';
-mongoose.connect(dev_db_url);
+dotenv.config();
+
+mongoose.connect(`mongodb://${process.env.MONGODB_CONTAINER}:${process.env.MONGODB_PORT}/weather`);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
@@ -17,7 +18,5 @@ app.use(bodyParser.json());
 app.use('/api/', router);
 
 cronTask.start();
-
-dotenv.config();
 
 app.listen( process.env.PORT, () => console.log(`App listening on port ${process.env.PORT}!`))
