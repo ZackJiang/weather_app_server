@@ -1,0 +1,11 @@
+version: "3"
+services:
+  web:
+    image: weather_app_server
+    links:
+      - mongo
+      - redis
+  mongo:
+     image: 'mongo'
+  redis:
+    image: redis
